@@ -15,12 +15,11 @@
  */
 
 import { syncProjectName } from './lib/ui';
+import { patchOW } from './lib/cli';
 
 // preloading hook.
 function init(commandTree, prequire) {
     if (typeof document === 'undefined') return;
-
-    // const wsk = prequire('/ui/commands/openwhisk-core');
 
     const host = document.getElementById('openwhisk-api-host');
     if (host) {
@@ -28,6 +27,8 @@ function init(commandTree, prequire) {
         host.setAttribute('onclick', 'repl.partial("project set <your_project_name>")');
     }
 
+    const wsk = prequire('/ui/commands/openwhisk-core');
+    patchOW(wsk);
     syncProjectName();
 }
 

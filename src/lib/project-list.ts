@@ -31,7 +31,7 @@ const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     const table = {
         headers: ['Name', 'Path'],
         rows: Object.keys(entries).map(key => {
-            const onclick = () => repl.qexec(`project set ${key}`);
+            const onclick = () => repl.pexec(`project set ${key}`);
             return [{ name: key, onclick }, { name: entries[key], onclick }];
         })
     };

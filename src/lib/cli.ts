@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { getCurrentProject } from './storage';
+
 export function error(modules, msg: string, usage = '') {
     throw new modules.errors.usage(`${msg}${usage ? '\n\n' : ''}${usage}`);
 }
@@ -81,5 +83,36 @@ export async function delay(ms) {
     });
 }
 
-export let globalFlagsUsage = `\t-v|--verbose   info level output
-\t-d|--debug     debug level output`;
+export function patchOW(wsk) {
+    if (!wsk.ow.patched) {
+        const rawList = wsk.ow.actions.list;
+        wsk.ow.actions.list = async function(options) {
+            const result = await rawList.apply(this, [options]);
+            const projectName = getCurrentProject();
+            if (projectName && result && result.filter) {
+                return result.filter(action => {
+                    if (action.annotations) {
+                        for (let kv of action.annotations) {
+                            if (kv.key === 'managed') {
+                                return kv.value === projectName;
+                            }
+                        }
+                    }
+                    return false;
+                });
+            }
+            return result;
+        };
+        const rawUpdate = wsk.ow.actions.update;
+        wsk.ow.actions.update = function(options) {
+            const projectName = getCurrentProject();
+            if (projectName) {
+                options.action.annotations = [...options.action.annotations, { key: 'managed', value: projectName }];
+
+            }
+            return rawUpdate.apply(this, [options]);
+        };
+
+        wsk.ow.patched = true;
+    }
+}

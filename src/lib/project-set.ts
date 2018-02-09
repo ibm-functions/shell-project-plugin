@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { getProjects, setCurrentProject } from './storage';
-import { error, sliceCmd } from './cli';
+import { error, sliceCmd, patchOW } from './cli';
 import { docSet } from './docs';
 
 declare const repl: any;
@@ -26,7 +26,7 @@ const usage = `${docSet}
 Required parameters:
 \t<projectName>       the project name`;
 
-const doSet = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
+const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
         throw new modules.errors.usage(usage);
 
@@ -40,9 +40,12 @@ const doSet = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (!projects[name])
         return error(modules, `project ${name} does not exists`);
     setCurrentProject(name);
+    patchOW(wsk);
     return true;
 };
 
-module.exports = (commandTree, require) => {
-    commandTree.listen('/project/set', doSet, { docs: docSet });
+module.exports = (commandTree, prequire) => {
+    const wsk = prequire('/ui/commands/openwhisk-core');
+
+    commandTree.listen('/project/set', doSet(wsk), { docs: docSet });
 };
