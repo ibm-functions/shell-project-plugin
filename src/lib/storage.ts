@@ -24,6 +24,7 @@ const projectkey = 'wsk.project';
 
 // Register new project
 export function addProject(path: string) {
+
     if (!existsSync(path))
         throw new Error(`${path} does not exists`);
 
@@ -31,7 +32,7 @@ export function addProject(path: string) {
     const projects = getProjects();
     const projectName = basename(path, extname(path));
 
-    projects[projectName] = path;
+    projects.entries[projectName] = path;
     if (!projects.current)
         projects.current = projectName;
 
@@ -44,7 +45,7 @@ export function removeProject(name: string) {
     delete projects[name];
 
     if (projects.current === name) {
-        const keys = Object.keys(projects);
+        const keys = Object.keys(projects.entries);
         projects.current = keys.length > 0 ? keys[0] : undefined;
     }
 
@@ -53,10 +54,17 @@ export function removeProject(name: string) {
 }
 
 export function getProjects() {
-    return JSON.parse(localStorage.getItem(projectkey) || '{}');
+    return JSON.parse(localStorage.getItem(projectkey) || '{ "entries": {} }');
 }
 
 export function getCurrentProject() {
     const projects = getProjects();
     return projects.current;
+}
+
+export function setCurrentProject(name: string) {
+    const projects = getProjects();
+    projects.current = name;
+    localStorage.setItem(projectkey, JSON.stringify(projects));
+    syncProjectName();
 }

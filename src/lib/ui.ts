@@ -21,7 +21,17 @@ export function syncProjectName() {
     nameElem.childNodes[0].textContent = projectName;
 }
 
-export function printProjects(projects): HTMLElement {
+export interface ITable {
+    headers: Array<string>;
+    rows: Array<Array<ICell>>;
+}
+
+export interface ICell {
+    name: string;
+    onclick?: () => any;
+}
+
+export function printTable(table: ITable): HTMLElement {
     const response = document.createElement('div');
     response.className = 'result-table';
 
@@ -33,38 +43,45 @@ export function printProjects(projects): HTMLElement {
     repl.appendChild(rows);
     rows.className = 'entity';
 
-    const header = document.createElement('div');
-    rows.appendChild(header);
-    header.className = 'entity-attributes';
-    header.style.fontWeight = '500';
-    header.style.borderBottom = '1px solid';
+    if (table.headers) {
+        const headers = document.createElement('div');
+        rows.appendChild(headers);
+        headers.className = 'entity-attributes';
+        headers.style.fontWeight = '500';
+        headers.style.borderBottom = '1px solid';
+        table.headers.forEach(headerText => {
+            headers.appendChild(headerHTML(headerText));
+        });
+    }
 
-    const header1 = document.createElement('span');
-    header1.style.borderRight = '1px solid';
-    header1.style.textAlign = 'center';
-    header.appendChild(header1);
-    header1.innerText = 'Name';
+    if (table.rows) {
+        table.rows.forEach(rowTexts => {
+            const row = document.createElement('div');
+            rows.appendChild(row);
+            row.className = 'entity-attributes';
 
-    const header2 = document.createElement('span');
-    header2.style.borderRight = '1px solid';
-    header2.style.textAlign = 'center';
-    header.appendChild(header2);
-    header2.innerText = 'Path';
+            rowTexts.forEach(cell => {
+                row.appendChild(cellHTML(cell));
+            });
+        });
+    }
 
-    Object.keys(projects).forEach(projectName => {
-        const row = document.createElement('div');
-        rows.appendChild(row);
-        row.className = 'entity-attributes';
-
-        const cell1 = document.createElement('span');
-        cell1.className = 'repl-result-prefix';
-        row.appendChild(cell1);
-        cell1.innerText = projectName;
-
-        const cell2 = document.createElement('span');
-        cell2.className = 'repl-result-prefix';
-        row.appendChild(cell2);
-        cell2.innerText = projects[projectName];
-    });
     return response;
+}
+
+function headerHTML(text: string): HTMLElement {
+    const header = document.createElement('span');
+    header.style.textAlign = 'center';
+    header.innerText = text;
+    return header;
+}
+
+function cellHTML(cell: ICell): HTMLElement {
+    const span = document.createElement('span');
+    span.className = 'entity-name-group';
+    span.innerText = cell.name;
+    if (cell.onclick) {
+        span.onclick = cell.onclick;
+    }
+    return span;
 }

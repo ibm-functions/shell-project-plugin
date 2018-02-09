@@ -16,10 +16,9 @@
 import { existsSync } from 'fs';
 import { sliceCmd, error } from './cli';
 import { addProject } from './storage';
+import { docAdd } from './docs';
 
-export const docs = 'Add project to the shell';
-
-const usage = `Register project.
+const usage = `${docAdd}
 
 \tadd <projectRootPath>
 
@@ -44,5 +43,5 @@ const doAdd = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
 };
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/add', doAdd, { docs });
+    commandTree.listen('/project/add', doAdd, { docs: docAdd });
 };

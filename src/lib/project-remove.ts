@@ -15,10 +15,9 @@
  */
 import { sliceCmd, error } from './cli';
 import { removeProject } from './storage';
+import { docRemove } from './docs';
 
-export const docs = 'Remove project from the shell';
-
-const usage = `${docs}.
+const usage = `${docRemove}.
 
 \tremove <projectName>
 
@@ -40,5 +39,5 @@ const doRemove = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
 };
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/remove', doRemove, { docs });
+    commandTree.listen('/project/remove', doRemove, { docs: docRemove });
 };

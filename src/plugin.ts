@@ -34,6 +34,7 @@ function init(commandTree, prequire) {
 module.exports = (commandTree, prequire) => {
     require('./lib/project')(commandTree, prequire);
     require('./lib/project-add')(commandTree, prequire);
+    require('./lib/project-set')(commandTree, prequire);
     require('./lib/project-remove')(commandTree, prequire);
     require('./lib/project-list')(commandTree, prequire);
 

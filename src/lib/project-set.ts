@@ -13,32 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getProjects } from './storage';
-import { ITable, printTable } from './ui';
-import { docList } from './docs';
+import { getProjects, setCurrentProject } from './storage';
+import { error, sliceCmd } from './cli';
+import { docSet } from './docs';
 
 declare const repl: any;
 
-const usage = docList;
+const usage = `${docSet}
 
-const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
+\tset <projectName>
+
+Required parameters:
+\t<projectName>       the project name`;
+
+const doSet = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
         throw new modules.errors.usage(usage);
 
-    const projects = getProjects();
+    sliceCmd(argv, 'set');
+    const name = argv._.shift();
 
-    const entries = projects.entries;
-    const table = {
-        headers: ['Name', 'Path'],
-        rows: Object.keys(entries).map(key => {
-            const onclick = () => repl.qexec(`project set ${key}`);
-            return [{ name: key, onclick }, { name: entries[key], onclick }];
-        })
-    };
+    if (!name)
+        return error(modules, 'missing project name');
 
-    return printTable(table);
+    const projects = getProjects().entries;
+    if (!projects[name])
+        return error(modules, `project ${name} does not exists`);
+    setCurrentProject(name);
+    return true;
 };
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/list', doList, { docs: docList });
+    commandTree.listen('/project/set', doSet, { docs: docSet });
 };

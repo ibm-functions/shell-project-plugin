@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 IBM Corporation
+ * Copyright 2018 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as projectAdd from './project-add';
+import * as docs from './docs';
 
 const usage = `Command related to projects.
-\tproject add                          [ ${projectAdd.docs} ]
-\tproject deploy                       [ Deploy project ]
-\tproject undeploy                     [ Undeploy project ]`;
+\tproject add                          [ ${docs.docAdd} ]
+\tproject set                          [ ${docs.docSet} ]
+\tproject remove                       [ ${docs.docRemove} ]
+\tproject list                         [ ${docs.docList} ]
+`;
+// \tproject deploy                       [ Deploy project ]
+// \tproject undeploy                     [ Undeploy project ]
 
-const doProject =  async (_1, _2, _3, modules, _4, _5, _6, argv) => {
+const doProject = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     throw new modules.errors.usage(usage);
 };
 
