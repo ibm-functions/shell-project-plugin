@@ -17,3 +17,5 @@ export const docAdd = 'Add project to the shell';
 export const docSet = 'Set current project';
 export const docList = 'List projects added to the shell';
 export const docRemove = 'Remove project from the shell';
+export const docDeploy = 'Deploy project';
+export const docUndeploy = 'Undeploy project';

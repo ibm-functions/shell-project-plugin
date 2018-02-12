@@ -20,9 +20,8 @@ const usage = `Command related to projects.
 \tproject set                          [ ${docs.docSet} ]
 \tproject remove                       [ ${docs.docRemove} ]
 \tproject list                         [ ${docs.docList} ]
-`;
-// \tproject deploy                       [ Deploy project ]
-// \tproject undeploy                     [ Undeploy project ]
+\tproject deploy                       [ ${docs.docDeploy} ]
+\tproject undeploy                     [ ${docs.docUndeploy} ]`;
 
 const doProject = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     throw new modules.errors.usage(usage);
