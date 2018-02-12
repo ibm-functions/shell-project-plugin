@@ -42,7 +42,7 @@ export function addProject(path: string) {
 
 export function removeProject(name: string) {
     const projects = getProjects();
-    delete projects[name];
+    delete projects.entries[name];
 
     if (projects.current === name) {
         const keys = Object.keys(projects.entries);

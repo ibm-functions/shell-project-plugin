@@ -48,7 +48,7 @@ The `wsk` commands have been modified to manage assets belonging to the project 
 
 ### Deploying project
 
-The `deploy` command allows to push your project to OpenWhisk.
+The `deploy` command allows pushing your project to OpenWhisk.
 
 ```
 $ fsh project deploy [<manifest.yml>]
