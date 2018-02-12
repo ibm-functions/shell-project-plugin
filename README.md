@@ -24,8 +24,7 @@ $ fsh plugin install shell-project-plugin
 
 When the project plugin is activated, the title bar shows the name of the current project.
 
-![Shell Title Bar](https://raw.github.ibm.com/villard/shell-project-plugin/master/doc/tile.png?token=AAAxzGNa9tniHwsL4UxYYOL1_ffOpuKnks5aiyMPwA%3D%3D)
-
+![Shell Title Bar](doc/title.png?raw=true)
 
 
 ## New and extended shell commands
