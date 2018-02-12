@@ -64,3 +64,10 @@ When you want to cleanup the assets you have previously deployed you can use the
 fsh project undeploy [<manifest.yml>]
 ```
 
+## Uninstalling `shell-project-plugin`
+
+In the shell, type:
+
+```
+plugin remove shell-project-plugin
+```
