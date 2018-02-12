@@ -15,29 +15,38 @@
  */
 import { existsSync } from 'fs';
 import { sliceCmd, error, checkExtraneous, checkExtraneousFlags } from './cli';
+import { checkTools, getToolsDir } from './tools';
+import { join } from 'path';
+import { execSync } from 'child_process';
 
 const usage = `Deploy project.
 
-\tdeploy <project.yml>
+\tdeploy [<manifest.yml>]
 
 Required parameters:
-\t<project.yml>       the project configuration file. Default is project.yml`;
+\t<manifest.yml>       the project configuration file (default "manifest.yml")`;
 
-const doDeploy = (_1, _2, _3, modules, _4, _5, _6, argv) => {
+async function doDeploy(block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv) {
     if (argv.help) {
-        throw new modules.errors.usage(usage);
+        throw new errors.usage(usage);
     }
+    const err = await checkTools(block, nextBlock, { ui });
+    if (err !== "")
+        return error({ errors }, err);
+
     sliceCmd(argv, 'deploy');
-    const file = argv._.shift() || 'project.yml';
+    const file = argv._.shift() || 'manifest.yml';
 
-    checkExtraneous(modules, argv);
+    checkExtraneous({ errors }, argv);
 
-    if (! existsSync(file))
-        return error(modules, `${file} does not exists`);
+    if (!existsSync(file))
+        return error({ errors }, `${file} does not exists`);
 
-    checkExtraneousFlags(modules, argv);
-    return true;
-};
+    checkExtraneousFlags({ errors }, argv);
+
+    const wskdeploy = join(getToolsDir(ui), 'wskdeploy').replace(/[ ]/g, '\\ ');
+    return execSync(`${wskdeploy} --managed`).toString();
+}
 
 module.exports = (commandTree, require) => {
     commandTree.listen('/project/deploy', doDeploy, { docs: 'Deploy project' });
