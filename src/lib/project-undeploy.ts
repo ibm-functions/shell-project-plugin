@@ -49,5 +49,5 @@ async function doUndeploy(block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv
 }
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/deploy', doUndeploy, { docs: 'Undeploy project' });
+    commandTree.listen('/project/undeploy', doUndeploy, { docs: 'Undeploy project' });
 };
