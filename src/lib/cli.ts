@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 IBM Corporation
+ * Copyright 2018 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,40 +37,6 @@ export function checkExtraneousFlags(modules, argv) {
     delete argv._;
     if (Object.keys(argv).length !== 0)
         throw new modules.errors.usage(`Extraneous flags(s): ${Object.keys(argv).join(', ')}`);
-}
-
-export function helpCommand(command: string, flags?: string[]) {
-    console.log('Usage:');
-    console.log(`  ${command}`);
-    console.log('');
-
-    if (flags) {
-        console.log('Flags:');
-        console.log(flags.join('\n  '));
-    }
-    return 'usage';
-}
-
-export function getLoggerLevel(argv) {
-    const verbose = consume(argv, ['v', 'verbose']);
-    const debug = consume(argv, ['d', 'debug']);
-    if (debug)
-        return 'debug';
-    if (verbose)
-        return 'info';
-    return 'off';
-}
-
-export function getGlobalFlags(argv) {
-    return {
-        apihost: consume(argv, ['apihost']),
-        apiversion: consume(argv, ['apiversion']),
-        auth: consume(argv, ['u', 'auth']),
-        cert: consume(argv, ['cert']),
-        insecure: consume(argv, ['i', 'insecure']),
-        key: consume(argv, ['key']),
-        env: consume(argv, ['e', 'env'])
-    };
 }
 
 export function sliceCmd(argv, cmd) {

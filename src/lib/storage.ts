@@ -15,29 +15,29 @@
  */
 
 import { existsSync } from 'fs';
-import { normalize, basename, extname, resolve  } from 'path';
+import { normalize, resolve  } from 'path';
 import { syncProjectName } from './ui';
-
-// --- Project storage
 
 const projectkey = 'wsk.project';
 
-// Register new project
-export function addProject(path: string) {
+export interface IProject {
+    name: string;
+    path: string;
+}
 
+// Register new project
+export function addProject(path: string, projectName: string) {
     if (!existsSync(path))
         throw new Error(`${path} does not exists`);
 
     path = normalize(resolve(path));
     const projects = getProjects();
-    const projectName = basename(path, extname(path));
 
-    projects.entries[projectName] = path;
+    projects.entries[projectName] = { name: projectName, path };
     if (!projects.current)
         projects.current = projectName;
 
     localStorage.setItem(projectkey, JSON.stringify(projects));
-    syncProjectName();
 }
 
 export function removeProject(name: string) {
@@ -50,14 +50,17 @@ export function removeProject(name: string) {
     }
 
     localStorage.setItem(projectkey, JSON.stringify(projects));
-    syncProjectName();
+}
+
+export function getProject(name: string): IProject {
+    return getProjects().entries[name];
 }
 
 export function getProjects() {
     return JSON.parse(localStorage.getItem(projectkey) || '{ "entries": {} }');
 }
 
-export function getCurrentProject() {
+export function getCurrentProject(): string {
     const projects = getProjects();
     return projects.current;
 }
@@ -66,5 +69,4 @@ export function setCurrentProject(name: string) {
     const projects = getProjects();
     projects.current = name;
     localStorage.setItem(projectkey, JSON.stringify(projects));
-    syncProjectName();
 }

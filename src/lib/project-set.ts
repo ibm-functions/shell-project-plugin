@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getProjects, setCurrentProject } from './storage';
+import { getProject } from './storage';
 import { error, sliceCmd, patchOW } from './cli';
 import { docSet } from './docs';
-
-declare const repl: any;
+import { switchTo } from './ui';
 
 const usage = `${docSet}
 
@@ -36,12 +35,11 @@ const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (!name)
         return error(modules, 'missing project name');
 
-    const projects = getProjects().entries;
-    if (!projects[name])
+    const project = getProject(name);
+    if (!project)
         return error(modules, `project ${name} does not exists`);
-    setCurrentProject(name);
-    patchOW(wsk);
-    return true;
+
+    switchTo(wsk, name, project.path);
 };
 
 module.exports = (commandTree, prequire) => {

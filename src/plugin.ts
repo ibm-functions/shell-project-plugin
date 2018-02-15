@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 IBM Corporation
+ * Copyright 2018 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { syncProjectName } from './lib/ui';
-import { patchOW } from './lib/cli';
+import { switchTo, syncProjectName } from "./lib/ui";
+import { getCurrentProject, getProject } from "./lib/storage";
 
 // preloading hook.
 function init(commandTree, prequire) {
@@ -28,8 +27,13 @@ function init(commandTree, prequire) {
     }
 
     const wsk = prequire('/ui/commands/openwhisk-core');
-    patchOW(wsk);
-    syncProjectName();
+    const projectName = getCurrentProject();
+    if (projectName) {
+        const project = getProject(projectName);
+        switchTo(wsk, projectName, project.path);
+    } else {
+        syncProjectName();
+    }
 }
 
 module.exports = (commandTree, prequire) => {
