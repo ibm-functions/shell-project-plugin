@@ -14,31 +14,34 @@
  * limitations under the License.
  */
 import { existsSync } from 'fs';
-import { sliceCmd, error, consume } from './cli';
+import { sliceCmd, error, consume, checkExtraneous, checkExtraneousFlags } from './cli';
 import { addProject } from './storage';
 import { docAdd } from './docs';
 import { basename, extname } from 'path';
 
 const usage = `${docAdd}
 
-\tadd [<project_root_path>]
+\tadd [-p|--path <project_path>] [-n|--name <project_name>]
 
 Optional parameters:
-\t<project_path>               the project root path. Default is current path;
-\t--name, -n <project_name>    the project name. Default is project path last segment`;
+\t-p --path  <project_path>          the project root path. Default is current directory;
+\t-n --name  <project_name>          the project name. Default is project path last segment`;
 
 const doAdd = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
         throw new modules.errors.usage(usage);
 
     sliceCmd(argv, 'add');
-    const path = argv._.shift() || process.cwd();
+    checkExtraneous(modules, argv);
 
+    const path = consume(argv, ['p', 'path']) || process.cwd();
     if (!existsSync(path))
         return error(modules, `${path} does not exists`);
 
     const pname = consume(argv, ['n', 'name']);
     const projectName = pname || basename(path, extname(path));
+
+    checkExtraneousFlags(modules, argv);
 
     addProject(path, projectName);
     return true;

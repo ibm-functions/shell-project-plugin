@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 export const docAdd = 'Add project to the shell';
-export const docSet = 'Set current project';
+export const docSet = 'Set current project to <project_name>';
 export const docList = 'List projects added to the shell';
 export const docRemove = 'Remove project from the shell';
 export const docDeploy = 'Deploy project';

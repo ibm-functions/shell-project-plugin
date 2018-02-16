@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { existsSync } from 'fs';
-import { sliceCmd, error, checkExtraneous, checkExtraneousFlags } from './cli';
+import { sliceCmd, error, checkExtraneous, checkExtraneousFlags, consume } from './cli';
 import { checkTools, getToolsDir } from './tools';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -26,10 +26,10 @@ const debug = dbgc('project:deploy');
 
 const usage = `Deploy project.
 
-\tdeploy [<manifest.yml>]
+\tdeploy
 
-Required parameters:
-\t<manifest.yml>       the project configuration file (default manifest.yml)`;
+Optional parameters:
+\t-m <manifest.yml>       the manifest to deploy (default manifest.yml)`;
 
 const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv) => {
     if (argv.help) {
@@ -40,9 +40,9 @@ const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6,
         return error({ errors }, err);
 
     sliceCmd(argv, 'deploy');
-    const file = argv._.shift() || 'manifest.yml';
-
     checkExtraneous({ errors }, argv);
+
+    const file = consume(argv, ['m']) || 'manifest.yml';
 
     if (!existsSync(file))
         return error({ errors }, `${file} does not exists`);
@@ -64,6 +64,7 @@ const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6,
 // Make sure backend is ready for deployment. Return the location of .wskprops to be used by wskdeploy
 async function prepareBackend(errors, userDataDir: string, env): Promise<string> {
     const vars = env.variables || {};
+
     // Check for mandatory env vars
     const apikey = vars.BLUEMIX_API_KEY;
     if (!apikey)
@@ -91,9 +92,13 @@ async function prepareBackend(errors, userDataDir: string, env): Promise<string>
 
 // Extends system environment variables
 function prepareEnvVars(wskCfg: string, env): { [key: string]: string } {
-    // TODO: env vars in env
+    const vars = { ... env.variables };
+    Object.keys(vars).forEach(key => {
+        vars[key] = vars[key].value;
+    });
+
     // TODO: consider not inheriting process env
-    return { ...process.env, WSK_CONFIG_FILE: wskCfg };
+    return { ...process.env, WSK_CONFIG_FILE: wskCfg, ... vars };
 }
 
 function resolveSpace(env, version): string {

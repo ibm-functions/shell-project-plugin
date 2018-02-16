@@ -20,10 +20,7 @@ import { switchTo } from './ui';
 
 const usage = `${docSet}
 
-\tset <projectName>
-
-Required parameters:
-\t<projectName>       the project name`;
+\tset <project_name>`;
 
 const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
@@ -39,7 +36,7 @@ const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (!project)
         return error(modules, `project ${name} does not exists`);
 
-    switchTo(wsk, name, project.path);
+    return switchTo(wsk, name, project.path);
 };
 
 module.exports = (commandTree, prequire) => {
