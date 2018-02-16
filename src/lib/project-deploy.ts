@@ -52,7 +52,7 @@ const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6,
     const current = env.current();
     const userData = ui.userDataDir();
     const wskCfg = (current) ? await prepareBackend(errors, userData, current) : join(homedir(), '.wskprops');
-    if (! existsSync(wskCfg))
+    if (!existsSync(wskCfg))
         return error({ errors }, `missing ${wskCfg}`);
 
     const sysenv = prepareEnvVars(wskCfg, current);
@@ -66,17 +66,9 @@ async function prepareBackend(errors, userDataDir: string, env): Promise<string>
     const vars = env.variables || {};
 
     // Check for mandatory env vars
-    const apikey = vars.BLUEMIX_API_KEY;
-    if (!apikey)
-        throw new errors.usage(errorMissingVar('BLUEMIX_API_KEY'));
-
-    const endpoint = vars.BLUEMIX_ENDPOINT;
-    if (!endpoint)
-        throw new errors.usage(errorMissingVar('BLUEMIX_ENDPOINT'));
-
-    const org = vars.BLUEMIX_ORG;
-    if (!org)
-        throw new errors.usage(errorMissingVar('BLUEMIX_ORG'));
+    const apikey = getVar(vars, 'BLUEMIX_API_KEY', errors);
+    const endpoint = getVar(vars, 'BLUEMIX_ENDPOINT', errors);
+    const org = getVar(vars, 'BLUEMIX_ORG', errors);
 
     // When deployment is once-only
     // if (env.readonly)
@@ -92,13 +84,13 @@ async function prepareBackend(errors, userDataDir: string, env): Promise<string>
 
 // Extends system environment variables
 function prepareEnvVars(wskCfg: string, env): { [key: string]: string } {
-    const vars = { ... env.variables };
+    const vars = { ...env.variables };
     Object.keys(vars).forEach(key => {
         vars[key] = vars[key].value;
     });
 
     // TODO: consider not inheriting process env
-    return { ...process.env, WSK_CONFIG_FILE: wskCfg, ... vars };
+    return { ...process.env, WSK_CONFIG_FILE: wskCfg, ...vars };
 }
 
 function resolveSpace(env, version): string {
@@ -109,6 +101,13 @@ function resolveSpace(env, version): string {
     bxspace = escapeNamespace(bxspace);
     debug(`targeting ${bxspace} space`);
     return bxspace;
+}
+
+function getVar(vars, name: string, errors) {
+    const variable = vars[name];
+    if (!variable || !variable.value)
+        throw new errors.usage(errorMissingVar(name));
+    return variable.value;
 }
 
 function errorMissingVar(name: string) {

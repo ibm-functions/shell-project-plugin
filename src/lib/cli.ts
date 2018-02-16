@@ -52,7 +52,8 @@ export async function delay(ms) {
 export function patchOW(wsk) {
     if (!wsk.ow.patched) {
         const rawList = wsk.ow.actions.list;
-        wsk.ow.actions.list = async function(options) {
+        // tslint:disable-next-line:space-before-function-paren
+        wsk.ow.actions.list = async function (options) {
             const result = await rawList.apply(this, [options]);
             const projectName = getCurrentProject();
             if (projectName && result && result.filter) {
@@ -60,7 +61,7 @@ export function patchOW(wsk) {
                     if (action.annotations) {
                         for (let kv of action.annotations) {
                             if (kv.key === 'managed') {
-                                return kv.value === projectName;
+                                return kv.value.__OW_PROJECT_NAME === projectName;
                             }
                         }
                     }
@@ -70,10 +71,11 @@ export function patchOW(wsk) {
             return result;
         };
         const rawUpdate = wsk.ow.actions.update;
-        wsk.ow.actions.update = function(options) {
+        // tslint:disable-next-line:space-before-function-paren
+        wsk.ow.actions.update = function (options) {
             const projectName = getCurrentProject();
             if (projectName) {
-                options.action.annotations = [...options.action.annotations, { key: 'managed', value: projectName }];
+                options.action.annotations = [...options.action.annotations, { key: 'managed', value: { __OW_PROJECT_NAME: projectName } }];
 
             }
             return rawUpdate.apply(this, [options]);
