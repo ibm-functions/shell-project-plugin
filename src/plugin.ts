@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { switchTo, syncProjectName } from "./lib/ui";
-import { getCurrentProject, getProject } from "./lib/storage";
+import { getCurrentProjectName, getProject, getCurrentProject } from "./lib/storage";
+import { EventEmitter } from 'events';
 
 // preloading hook.
 function init(commandTree, prequire) {
@@ -27,7 +28,7 @@ function init(commandTree, prequire) {
     }
 
     const wsk = prequire('/ui/commands/openwhisk-core');
-    const projectName = getCurrentProject();
+    const projectName = getCurrentProjectName();
     if (projectName) {
         const project = getProject(projectName);
         switchTo(wsk, projectName, project.path);
@@ -46,4 +47,8 @@ module.exports = (commandTree, prequire) => {
     require('./lib/project-undeploy')(commandTree, prequire);
 
     init(commandTree, prequire);
+
+    return {
+        current: getCurrentProject
+    };
 };

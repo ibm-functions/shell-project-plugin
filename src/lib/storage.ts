@@ -60,11 +60,15 @@ export function getProjects() {
     return JSON.parse(localStorage.getItem(projectkey) || '{ "entries": {} }');
 }
 
-export function getCurrentProject(): string {
+export function getCurrentProject(): IProject {
+    const projects = getProjects();
+    return getProject(projects.current);
+}
+
+export function getCurrentProjectName(): string {
     const projects = getProjects();
     return projects.current;
 }
-
 export function setCurrentProject(name: string) {
     const projects = getProjects();
     projects.current = name;

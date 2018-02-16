@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getCurrentProject, setCurrentProject } from './storage';
+import { setCurrentProject, getCurrentProjectName } from './storage';
 import { patchOW } from './cli';
 
 declare const repl: any;
@@ -27,7 +27,7 @@ export async function switchTo(wsk, name: string, path: string) {
 
 export function syncProjectName() {
     const nameElem = document.getElementById('openwhisk-api-host');
-    const projectName = getCurrentProject() || 'no project';
+    const projectName = getCurrentProjectName() || 'no project';
     nameElem.childNodes[0].textContent = projectName;
 }
 
