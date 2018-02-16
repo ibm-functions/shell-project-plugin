@@ -42,8 +42,10 @@ export interface ICredential {
     /* IBM Cloud endpoint */
     endpoint?: string;
 
+    /* IBM Cloud organization. Optional */
     org?: string;
 
+    /* IBM Cloud space. Optional */
     space?: string;
 
     /* Local cache (filesystem) */
@@ -81,27 +83,26 @@ export async function run(cred: ICredential, cmd: string) {
 async function doRun(cred: ICredential, cmd: string) {
     const bx = `WSK_CONFIG_FILE="${wskProps(cred)}" BLUEMIX_HOME="${cred.home}" bx ${cmd}`;
     debug(`exec ${bx}`);
-    return exec(bx);
+    const result = await exec(bx);
+    debug(`result: ${result}`);
+    return result;
 }
 
 // Login to Bluemix. Only do it if token has expired.
 async function login(cred: ICredential) {
+    let dologin = true;
     const key = getIAMTokenKey(cred);
     let token = iamTokens[key];
-    if (!token) {
-        token = cacheIAMToken(cred);
-        if (!token)
-            return false;
+    if (token) {
+        // Check expiration
+        const now = Date.now() / 1000;
+        dologin = (token.exp + 300) > now; // Give 5mn for the command to run.
     }
 
-    // Check expiration
-    const now = Date.now() / 1000;
-
-    const valid = (token.exp + 300) < now; // Give 5mn for the command to run.
-
-    if (!valid) {
+    if (dologin) {
         debug('Refreshing IBM cloud IAM token');
-        const bx = `BLUEMIX_HOME="${cred.home}" bx login -a ${cred.endpoint} --apikey ${cred.apikey} -o ${cred.org} -s ${cred.space}`;
+        const space = cred.space ? `-s ${cred.space}` : '';
+        const bx = `login -a ${cred.endpoint} --apikey ${cred.apikey} -o ${cred.org} ${space}`;
         try {
             await doRun(cred, bx);
             cacheIAMToken(cred);
@@ -147,7 +148,7 @@ function ICInvalidateIamToken(cred: ICredential) {
 }
 
 function getIAMTokenKey(cred: ICredential): string {
-    return `${cred.endpoint}${cred.org}${cred.space}`;
+    return `${cred.endpoint}${cred.org}${cred.space ? cred.space : ''}`;
 }
 
 // Install Cloud function plugin
@@ -161,13 +162,15 @@ export async function installWskPlugin(cred: ICredential) {
 }
 
 export function fixupCredentials(cred: ICredential, userDataDir: string) {
-    cred.home = path.join(userDataDir, 'bx', cred.endpoint, cred.org, cred.space);
+    cred.home = path.join(userDataDir, 'bx', cred.endpoint, cred.org, cred.space ? cred.space : '');
 }
 
 export async function ensureSpaceExists(cred: ICredential) {
     debug(`checking ${cred.space} space exists`);
 
-    await run(cred, `account space-create ${cred.space}`); // fast when already exists
+    const subcred = {...cred};
+    delete subcred.space;
+    await run(subcred, `account space-create ${cred.space}`); // fast when already exists
 
     await installWskPlugin(cred);
     await refreshWskProps(cred, 30); // refresh .wskprops
