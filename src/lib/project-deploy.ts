@@ -29,7 +29,7 @@ const usage = `Deploy project.
 Optional parameters:
 \t-m <manifest.yml>       the manifest to deploy (default manifest.yml)`;
 
-const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv) => {
+const doDeploy = prequire => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv) => {
     if (argv.help) {
         throw new errors.usage(usage);
     }
@@ -47,11 +47,9 @@ const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6,
 
     checkExtraneousFlags({ errors }, argv);
 
-    const current = env.current();
+    const env = getEnvPlugin(prequire);
+    const current = env ? env.current() : null;
     const userData = ui.userDataDir();
-    // const wskCfg = (current) ? await prepareWskprops(errors, userData, current) : join(homedir(), '.wskprops');
-    // if (!existsSync(wskCfg))
-    //     return error({ errors }, `missing ${wskCfg}`);
 
     const sysenv = prepareEnvVars(current);
     const wskdeploy = join(getToolsDir(ui), 'wskdeploy').replace(/[ ]/g, '\\ ');
@@ -59,23 +57,30 @@ const doDeploy = env => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6,
     return execSync(`${wskdeploy} --managed`, { env: sysenv }).toString();
 };
 
+function getEnvPlugin(prequire) {
+    try {
+        return prequire('shell-environment-plugin');
+    } catch (e) {
+        // no environment, fine
+        return null;
+    }
+}
+
 // Extends system environment variables
 function prepareEnvVars(env): { [key: string]: string } {
-    const vars = { ...env.variables };
-    Object.keys(vars).forEach(key => {
-        vars[key] = vars[key].value;
-    });
-
+    if (env) {
+        const vars = { ...env.variables };
+        Object.keys(vars).forEach(key => {
+            vars[key] = vars[key].value;
+        });
+        // TODO: consider not inheriting process env
+        return { ...process.env, ...vars };
+    }
     // TODO: consider not inheriting process env
-    return { ...process.env, ...vars }; // WSK_CONFIG_FILE: wskCfg,
+    return { ...process.env };
 }
 
 module.exports = (commandTree, prequire) => {
-    let env;
-    try {
-        env = prequire('shell-environment-plugin');
-    } catch (e) {
-        // no environment, fine
-    }
-    commandTree.listen('/project/deploy', doDeploy(env), { docs: 'Deploy project' });
+
+    commandTree.listen('/project/deploy', doDeploy(prequire), { docs: 'Deploy project' });
 };
