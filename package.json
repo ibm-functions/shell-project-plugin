@@ -28,11 +28,13 @@
     "decompress-tar": "^4.1.1",
     "follow-redirects": "^1.4.1",
     "fs-extra": "^5.0.0",
+    "jwt-decode": "^2.2.0",
     "properties-parser": "^0.3.1"
   },
   "devDependencies": {
     "@types/debug": "^0.0.30",
     "@types/node": "^8.0.56",
+    "mocha-typescript": "^1.1.12",
     "typescript": "^2.6.2"
   }
 }

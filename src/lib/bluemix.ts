@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { homedir } from 'os';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { exec } from 'child-process-promise';
 import * as parser from 'properties-parser';
+import * as jwtDecode from 'jwt-decode';
 
 import * as dbgc from 'debug';
 const debug = dbgc('project:bluemix');
@@ -58,78 +58,104 @@ export interface IWskProps {
     [key: string]: any;
 }
 
-export const wskProps = (cred: ICredential) => `${cred.home}/.wskprops`;
-
-// Run bluemix command. Retries once if not logged in.
-export async function run(cred: ICredential, cmd: string) {
-    return doRun(cred, cmd);
+interface IJWTToken {
+    name: string;
+    iat: number; // Issued At
+    exp: number; // Experiration time in second
 }
 
+// Decoded IAM tokens
+const iamTokens: { [key: string]: IJWTToken } = {};
+
+export const wskProps = (cred: ICredential) => `${cred.home}/.wskprops`;
+
+// Run bluemix command. Refresh token if needed.
+export async function run(cred: ICredential, cmd: string) {
+    if (await login(cred)) {
+        return doRun(cred, cmd);
+    }
+    return null;
+}
+
+// Same as run without login
 async function doRun(cred: ICredential, cmd: string) {
     const bx = `WSK_CONFIG_FILE="${wskProps(cred)}" BLUEMIX_HOME="${cred.home}" bx ${cmd}`;
     debug(`exec ${bx}`);
-    try {
-        return await exec(bx);
-    } catch (e) {
-        if (await doLogin(cred))
-            return doRun(cred, cmd); //  tokens have been refreshed. Retry command.
-        else {
-            throw e; // something else happened.
-        }
-    }
+    return exec(bx);
 }
 
-// Login to Bluemix
+// Login to Bluemix. Only do it if token has expired.
 async function login(cred: ICredential) {
-    try {
+    const key = getIAMTokenKey(cred);
+    let token = iamTokens[key];
+    if (!token) {
+        token = cacheIAMToken(cred);
+        if (!token)
+            return false;
+    }
+
+    // Check expiration
+    const now = Date.now() / 1000;
+
+    const valid = (token.exp + 300) < now; // Give 5mn for the command to run.
+
+    if (!valid) {
+        debug('Refreshing IBM cloud IAM token');
+        const bx = `BLUEMIX_HOME="${cred.home}" bx login -a ${cred.endpoint} --apikey ${cred.apikey} -o ${cred.org} -s ${cred.space}`;
         try {
-            await doRun(cred, 'target');
+            await doRun(cred, bx);
+            cacheIAMToken(cred);
         } catch (e) {
-            await doLogin(cred);
-        }
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
-
-// Login to Bluemix. @return true if tokens have been refreshed.
-async function doLogin(cred: ICredential) {
-    try {
-        const target = `BLUEMIX_HOME="${cred.home}" bx target`;
-        debug(`exec ${target}`);
-        await exec(target);
-        return false;
-    } catch (e) {
-        await refreshTokens(cred);
-        return true;
-    }
-}
-
-async function refreshTokens(cred: ICredential) {
-    const space = cred.space ? `-s ${cred.space}` : '';
-    const bx = `BLUEMIX_HOME="${cred.home}" bx login -a ${cred.endpoint} --apikey ${cred.apikey} -o ${cred.org} ${space}`;
-    try {
-        await exec(bx);
-    } catch (e) {
-        if (space && e.stdout && e.stdout.includes(`Space '${cred.space}' was not found.`)) {
-            // space does not exist and requested => create.
-            const newspace = `BLUEMIX_HOME=${cred.home} bx account space-create ${cred.space}`;
-            await exec(newspace);
-        } else {
             debug(e);
-            throw e;
+            return false;
         }
     }
     return true;
 }
 
+function cacheIAMToken(cred: ICredential): IJWTToken {
+    const cfgFilename = path.join(cred.home, '.bluemix', 'config.json');
+    const config = fs.readJSONSync(cfgFilename, { throws: false });
+    if (!config) {
+        debug(`${cfgFilename} could not be read`);
+        return null;
+    }
+
+    if (!config.IAMToken || config.IAMToken.length < 7) {
+        debug(`no IAM token in ${cfgFilename}`);
+        return null;
+    }
+
+    const rawToken = config.IAMToken.substr(7);
+    try {
+        const token = jwtDecode(rawToken);
+
+        const key = getIAMTokenKey(cred);
+        iamTokens[key] = token;
+        debug(`token ${key} cached`);
+        return token;
+    } catch (e) {
+        debug(e); // Invalid token?
+        return null;
+    }
+}
+
+// ICInvalidateIamToken invalidate token. Will be refreshed when login is called
+function ICInvalidateIamToken(cred: ICredential) {
+    const key = getIAMTokenKey(cred);
+    delete iamTokens[key];
+}
+
+function getIAMTokenKey(cred: ICredential): string {
+    return `${cred.endpoint}${cred.org}${cred.space}`;
+}
+
 // Install Cloud function plugin
 export async function installWskPlugin(cred: ICredential) {
-    try {
-        await run(cred, 'wsk');
-    } catch (e) {
+    const cfpath = path.join(cred.home, '.bluemix', 'plugins', 'cloud-functions');
+    if (!fs.pathExistsSync(cfpath)) {
         debug('installing IBM cloud function plugin');
+        // TODO: should use local copy.
         await run(cred, 'plugin install Cloud-Functions -r Bluemix -f');
     }
 }
@@ -141,8 +167,7 @@ export function fixupCredentials(cred: ICredential, userDataDir: string) {
 export async function ensureSpaceExists(cred: ICredential) {
     debug(`checking ${cred.space} space exists`);
 
-    await doRun(cred, `account space-create ${cred.space}`); // fast when already exists
-    await doRun(cred, `target -s ${cred.space}`);
+    await run(cred, `account space-create ${cred.space}`); // fast when already exists
 
     await installWskPlugin(cred);
     await refreshWskProps(cred, 30); // refresh .wskprops
@@ -154,7 +179,7 @@ async function refreshWskProps(cred: ICredential, retries: number) {
 
     const io = await doRun(cred, 'wsk property get');
     if (io.stderr) {
-        // await delay(1000);
+        await delay(500);
         debug(`could not get wsk AUTH key. Retrying (${retries}) (${io.stderr})`);
         await refreshWskProps(cred, retries - 1);
     }
@@ -167,63 +192,15 @@ export async function getWskPropsForSpace(cred: ICredential) {
     return parser.read(wskProps(cred));
 }
 
-// Populate props with Bluemix specific authentication
-export async function resolveAuth(props, env: string, version: string) {
-    if (!isBluemixCapable())
-        throw new Error('bx is not installed');
-
-    let bxorg = process.env.BLUEMIX_ORG || props.get('BLUEMIX_ORG');
-    if (!bxorg)
-        throw new Error('cannot resolve AUTH and APIGW_ACCESS_TOKEN from Bluemix credential: missing BLUEMIX_ORG');
-
-    let bxspace = props.get('BLUEMIX_SPACE');
-    bxspace = bxspace ? bxspace.trim() : null;
-    if (!bxspace) {
-        let projectname = props.get('PROJECT_NAME');
-        if (!projectname)
-            throw new Error(`cannot resolve AUTH: missing project name.`);
-
-        if (version)
-            bxspace = `${projectname}-${env}@${version}`;
-        else
-            bxspace = `${projectname}-${env}`;
-
-        bxspace = escapeNamespace(bxspace);
-        debug(`targeting ${bxspace} space`);
-    }
-
-    const cred: ICredential = { org: bxorg, space: bxspace };
-    const wskprops = await getWskPropsForSpace(cred);
-
-    if (!wskprops.AUTH)
-        throw new Error('missing AUTH in .wskprops');
-    if (!wskprops.APIGW_ACCESS_TOKEN)
-        throw new Error('missing APIGW_ACCESS_TOKEN in .wskprops');
-
-    props.set('ENVNAME', env);
-    if (version)
-        props.set('ENVVERSION', version);
-    props.set('BLUEMIX_ORG', bxorg);
-    props.set('BLUEMIX_SPACE', bxspace);
-    props.set('AUTH', wskprops.AUTH);
-    props.set('APIGW_ACCESS_TOKEN', wskprops.APIGW_ACCESS_TOKEN);
-}
-
-// Prepare backend so that the OpenWhisk client works
-export async function initWsk(wskprops: IWskProps) {
-    if (wskprops.BLUEMIX_ORG && wskprops.BLUEMIX_SPACE) {
-        const cred: ICredential = { org: wskprops.BLUEMIX_ORG, space: wskprops.BLUEMIX_SPACE };
-        await ensureSpaceExists(cred);
-
-        // Patch APIGW_ACCESS_TOKEN
-        const bxwskprops = parser.read(`${cred.home}/.wskprops`);
-        wskprops.APIGW_ACCESS_TOKEN = bxwskprops.APIGW_ACCESS_TOKEN;
-    }
-}
-
 // Convert env name to valid namespace
 export function escapeNamespace(str: string) {
     // The first character must be an alphanumeric character, or an underscore.
     // The subsequent characters can be alphanumeric, spaces, or any of the following: _, @, ., -
     return str.replace(/[+]/g, '-');
+}
+
+export async function delay(ms) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), ms);
+    });
 }
