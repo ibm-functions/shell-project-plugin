@@ -46,17 +46,20 @@ fsh project undeploy                     [ Undeploy project ]
 
 The `wsk` commands have been modified to manage assets belonging to the project only. E.g `wsk action list` shows only the project actions. For now only `wsk action list` and `wsk action update` have been changed. There is a plan to change the rest of the wsk commands.
 
-### Deploying project
+## Adding a project to the Cloud Shell
 
-The `deploy` command allows pushing your project to OpenWhisk.
+You first need to tell the shell where is the root folder containing your project by using `project add`. The simple way is to set the current directory to your project directory (by using the `lcd` command) and to type `project add`. Each project is associated with a name determined as follows:
+- the value of the property `project.name` in `manifest.yaml`
+- the option `-name <project_name>`
+- the project path last segment
 
-```
-$ fsh project deploy [<manifest.yml>]
-```
+The project name can be used to set the current project or remove a project from the shell.
 
-Deploy assets described in the given manifest. More information about the manifest format can be found [here](https://github.com/apache/incubator-openwhisk-wskdeploy)
+## Deploying a project
 
-### Removing a project from OpenWhisk
+By default `project deploy` runs [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) on `manifest.yml` in the root project directory.
+
+## Removing a project from OpenWhisk
 
 When you want to cleanup the assets you have previously deployed you can use the `undeploy` command.
 
