@@ -11,6 +11,7 @@ env:
 before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
+  - export PATH=$TRAVIS_BUILD_DIR/IBM\ Cloud\ Functions\ Shell-linux-x64/:$PATH
 
 install:
   - tools/travis/bxsetup.sh
