@@ -50,7 +50,7 @@ const doUpdate = rawUpdate => async function () {
 const doGet = rawGet => async function () {
     const result = await rawGet.apply(undefined, arguments);
     if (result && result.message)
-        checkInProject(result.message.annotation);
+        checkInProject(result.message.annotations);
 
     return result;
 };
