@@ -14,3 +14,5 @@ fsh --version
 
 echo "install project plugin"
 fsh plugin install shell-project-plugin
+
+echo "done"
