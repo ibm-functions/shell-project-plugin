@@ -1,6 +1,6 @@
 {
   "name": "shell-project-plugin",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "IBM Cloud shell plugin for managing project",
   "main": "plugin/plugin.js",
   "scripts": {
