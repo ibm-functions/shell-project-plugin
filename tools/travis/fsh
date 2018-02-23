@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exec $TRAVIS_BUILD_DIR/IBM\ Cloud\ Functions\ Shell-linux-x64/IBM\ Cloud\ Functions\ Shell --fsh-headless $@
