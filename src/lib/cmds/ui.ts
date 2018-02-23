@@ -25,7 +25,7 @@ export async function switchTo(wsk, name: string, path: string) {
 
 export function syncProjectName() {
     const nameElem = document.getElementById('openwhisk-api-host');
-    const projectName = getCurrentProjectName() || 'no project';
+    const projectName = getCurrentProjectName() || 'No active project';
     nameElem.childNodes[0].textContent = projectName;
 }
 

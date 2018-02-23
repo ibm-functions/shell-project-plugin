@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const docAdd = 'Add project to the shell';
-export const docSet = 'Set current project';
-export const docUnset = 'Unset current project';
-export const docList = 'List projects added to the shell';
-export const docRemove = 'Remove project from the shell';
-export const docDeploy = 'Deploy project';
-export const docUndeploy = 'Undeploy project';
+import { unsetCurrentProject } from '../storage';
+import { docUnset } from './docs';
+import { syncProjectName } from './ui';
+
+const usage = docUnset;
+
+const doUnset = (_1, _2, _3, modules, _4, _5, _6, argv) => {
+    if (argv.help)
+        throw new modules.errors.usage(usage);
+
+    unsetCurrentProject();
+    syncProjectName();
+
+    return true;
+};
+
+module.exports = (commandTree, prequire) => {
+    commandTree.listen('/project/unset', doUnset, { docs: docUnset });
+};

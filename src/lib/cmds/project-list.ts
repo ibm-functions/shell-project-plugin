@@ -50,5 +50,6 @@ const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
 };
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/list', doList, { docs: docList });
+    const master = commandTree.listen('/project/list', doList, { docs: docList });
+    commandTree.synonym('/project/ls', doList, master);
 };

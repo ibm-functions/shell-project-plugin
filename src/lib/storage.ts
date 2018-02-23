@@ -69,8 +69,15 @@ export function getCurrentProjectName(): string {
     const projects = getProjects();
     return projects.current;
 }
+
 export function setCurrentProject(name: string) {
     const projects = getProjects();
     projects.current = name;
+    localStorage.setItem(projectkey, JSON.stringify(projects));
+}
+
+export function unsetCurrentProject() {
+    const projects = getProjects();
+    projects.current = null;
     localStorage.setItem(projectkey, JSON.stringify(projects));
 }

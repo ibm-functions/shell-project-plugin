@@ -18,6 +18,7 @@ import * as docs from './docs';
 const usage = `Command related to projects.
 \tproject add                          [ ${docs.docAdd} ]
 \tproject set                          [ ${docs.docSet} ]
+\tproject unset                        [ ${docs.docUnset} ]
 \tproject remove                       [ ${docs.docRemove} ]
 \tproject list                         [ ${docs.docList} ]
 \tproject deploy                       [ ${docs.docDeploy} ]
@@ -32,6 +33,7 @@ module.exports = (commandTree, prequire) => {
 
     require('./project-add')(commandTree, prequire);
     require('./project-set')(commandTree, prequire);
+    require('./project-unset')(commandTree, prequire);
     require('./project-remove')(commandTree, prequire);
     require('./project-list')(commandTree, prequire);
     require('./project-deploy')(commandTree, prequire);

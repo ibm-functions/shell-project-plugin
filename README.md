@@ -37,6 +37,7 @@ Welcome to the IBM Cloud Functions Shell
 
 fsh project add                          [ Add project to the shell ]
 fsh project set                          [ Set current project ]
+fsh project unset                        [ Unset current project ]
 fsh project remove                       [ Remove project from the shell ]
 fsh project list                         [ List projects added to the shell ]
 fsh project deploy                       [ Deploy project ]
@@ -44,7 +45,7 @@ fsh project undeploy                     [ Undeploy project ]
 ...
 ```
 
-The `wsk` commands have been modified to manage assets belonging to the project only. E.g `wsk action list` shows only the project actions. For now only `wsk action list` and `wsk action update` have been changed. There is a plan to change the rest of the wsk commands.
+The `wsk` commands have been modified to manage assets belonging to the project only. E.g `wsk action list` shows only the project actions.
 
 ## Adding a project to the Cloud Shell
 
@@ -55,17 +56,11 @@ You first need to tell the shell where is the root folder containing your projec
 
 The project name can be used to set the current project or remove a project from the shell.
 
-## Deploying a project
+## Set and unset the current active project
 
-By default `project deploy` runs [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) on `manifest.yml` in the root project directory.
+The `set` command is used to switch between projects. It also automatically changes the current directory to the project root folder.
 
-## Removing a project from OpenWhisk
-
-When you want to cleanup the assets you have previously deployed you can use the `undeploy` command.
-
-```
-fsh project undeploy [<manifest.yml>]
-```
+If you want to manage assets that don't belong to a specific project, you can `unset` the active project. This restore the Cloud Shell behavior as if this plugin was deactivated.
 
 ## Uninstalling `shell-project-plugin`
 
