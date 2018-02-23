@@ -60,7 +60,7 @@ The project name can be used to set the current project or remove a project from
 
 The `set` command is used to switch between projects. It also automatically changes the current directory to the project root folder.
 
-If you want to manage assets that don't belong to a specific project, you can `unset` the active project. This restore the Cloud Shell behavior as if this plugin was deactivated.
+If you want to manage assets that don't belong to a specific project, you can `unset` the current project to restore the default Cloud Shell behavior.
 
 ## Uninstalling `shell-project-plugin`
 
