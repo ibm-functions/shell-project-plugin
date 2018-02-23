@@ -15,7 +15,7 @@
  */
 import { existsSync } from 'fs';
 import { sliceCmd, error, checkExtraneous, checkExtraneousFlags, consume } from './cli';
-import { checkTools, getToolsDir } from './tools';
+import { checkTools, getToolsDir } from '../tools';
 import { join } from 'path';
 import { homedir } from 'os';
 import { execSync } from 'child_process';
@@ -81,6 +81,5 @@ function prepareEnvVars(env): { [key: string]: string } {
 }
 
 module.exports = (commandTree, prequire) => {
-
     commandTree.listen('/project/deploy', doDeploy(prequire), { docs: 'Deploy project' });
 };

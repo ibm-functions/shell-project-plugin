@@ -15,10 +15,10 @@
  */
 import { suite, test, slow, timeout, skip } from 'mocha-typescript';
 import * as assert from 'assert';
-import {  } from '../lib/bluemix';
+import {  } from '../lib/cmds/project-add';
 
-@suite('Bluemix TestSuite')
-class BluemixSuite {
+@suite('UnitTestSuite')
+class UnitTestSuite {
 
     @test('should login to bluemix')
     async loginBx() {

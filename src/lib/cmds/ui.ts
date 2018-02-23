@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { setCurrentProject, getCurrentProjectName } from './storage';
-import { patchOW } from './cli';
+import { setCurrentProject, getCurrentProjectName } from '../storage';
 
 declare const repl: any;
 
 export async function switchTo(wsk, name: string, path: string) {
     setCurrentProject(name);
     syncProjectName();
-    patchOW(wsk);
     return repl.qexec(`lcd ${path}`);
 }
 

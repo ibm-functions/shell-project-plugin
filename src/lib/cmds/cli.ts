@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { getCurrentProjectName } from '../storage';
 
-import { getCurrentProject } from './storage';
+import * as dbgc from 'debug';
+const debug = dbgc('project:cli');
 
 export function error(modules, msg: string, usage = '') {
     throw new modules.errors.usage(`${msg}${usage ? '\n\n' : ''}${usage}`);
@@ -47,40 +49,4 @@ export async function delay(ms) {
     return new Promise(resolve => {
         setTimeout(() => resolve(), ms);
     });
-}
-
-export function patchOW(wsk) {
-    if (!wsk.ow.patched) {
-        const rawList = wsk.ow.actions.list;
-        // tslint:disable-next-line:space-before-function-paren
-        wsk.ow.actions.list = async function (options) {
-            const result = await rawList.apply(this, [options]);
-            const projectName = getCurrentProject();
-            if (projectName && result && result.filter) {
-                return result.filter(action => {
-                    if (action.annotations) {
-                        for (let kv of action.annotations) {
-                            if (kv.key === 'managed') {
-                                return kv.value.__OW_PROJECT_NAME === projectName;
-                            }
-                        }
-                    }
-                    return false;
-                });
-            }
-            return result;
-        };
-        const rawUpdate = wsk.ow.actions.update;
-        // tslint:disable-next-line:space-before-function-paren
-        wsk.ow.actions.update = function (options) {
-            const projectName = getCurrentProject();
-            if (projectName) {
-                options.action.annotations = [...options.action.annotations, { key: 'managed', value: { __OW_PROJECT_NAME: projectName } }];
-
-            }
-            return rawUpdate.apply(this, [options]);
-        };
-
-        wsk.ow.patched = true;
-    }
 }

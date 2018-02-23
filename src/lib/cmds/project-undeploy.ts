@@ -15,7 +15,7 @@
  */
 import { existsSync } from 'fs';
 import { sliceCmd, error, checkExtraneous, checkExtraneousFlags } from './cli';
-import { checkTools, getToolsDir } from './tools';
+import { checkTools, getToolsDir } from '../tools';
 import { join } from 'path';
 import { execSync } from 'child_process';
 

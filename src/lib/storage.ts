@@ -16,7 +16,7 @@
 
 import { existsSync } from 'fs';
 import { normalize, resolve  } from 'path';
-import { syncProjectName } from './ui';
+import { syncProjectName } from './cmds/ui';
 
 const projectkey = 'wsk.project';
 

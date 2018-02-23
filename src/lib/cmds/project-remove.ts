@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { sliceCmd, error } from './cli';
-import { removeProject } from './storage';
+import { removeProject } from '../storage';
 import { docRemove } from './docs';
 
 const usage = `${docRemove}.

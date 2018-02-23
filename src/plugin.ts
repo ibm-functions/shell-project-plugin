@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { switchTo, syncProjectName } from "./lib/ui";
+import { switchTo, syncProjectName } from "./lib/cmds/ui";
 import { getCurrentProjectName, getProject, getCurrentProject } from "./lib/storage";
 import { EventEmitter } from 'events';
 
@@ -38,13 +38,8 @@ function init(commandTree, prequire) {
 }
 
 module.exports = (commandTree, prequire) => {
-    require('./lib/project')(commandTree, prequire);
-    require('./lib/project-add')(commandTree, prequire);
-    require('./lib/project-set')(commandTree, prequire);
-    require('./lib/project-remove')(commandTree, prequire);
-    require('./lib/project-list')(commandTree, prequire);
-    require('./lib/project-deploy')(commandTree, prequire);
-    require('./lib/project-undeploy')(commandTree, prequire);
+    require('./lib/cmds/project')(commandTree, prequire);
+    require('./lib/cmds/wsk')(commandTree, prequire);
 
     init(commandTree, prequire);
 

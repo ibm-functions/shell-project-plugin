@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getProject } from './storage';
-import { error, sliceCmd, patchOW } from './cli';
+import { getProject } from '../storage';
+import { error, sliceCmd } from './cli';
 import { docSet } from './docs';
 import { switchTo } from './ui';
 

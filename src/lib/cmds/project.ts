@@ -27,6 +27,13 @@ const doProject = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     throw new modules.errors.usage(usage);
 };
 
-module.exports = (commandTree, require) => {
+module.exports = (commandTree, prequire) => {
     commandTree.listen('/project', doProject, { docs: 'Command related to projects' });
+
+    require('./project-add')(commandTree, prequire);
+    require('./project-set')(commandTree, prequire);
+    require('./project-remove')(commandTree, prequire);
+    require('./project-list')(commandTree, prequire);
+    require('./project-deploy')(commandTree, prequire);
+    require('./project-undeploy')(commandTree, prequire);
 };

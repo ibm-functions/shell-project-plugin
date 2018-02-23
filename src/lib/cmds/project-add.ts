@@ -15,7 +15,7 @@
  */
 import { existsSync } from 'fs';
 import { sliceCmd, error, consume, checkExtraneous, checkExtraneousFlags } from './cli';
-import { addProject } from './storage';
+import { addProject } from '../storage';
 import { docAdd } from './docs';
 import { basename, extname } from 'path';
 
