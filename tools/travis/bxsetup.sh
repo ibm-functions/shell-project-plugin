@@ -2,9 +2,11 @@
 
 set -e
 
+curl https://dal.objectstorage.open.softlayer.com/v1/AUTH_29373a04ec0c4e30b2626e295d134125/v1.3.419/IBM%20Cloud%20Functions%20Shell-linux-x64.zip > boo.zip
+
 echo "install the shell"
 export DEBUG=*
-export NODE_OPTIONS=--max-old-space-size=4096
+export NODE_OPTIONS=--max-old-space-size=8192
 npm install -g @ibm-functions/shell
 
 if [[ $BLUEMIX_ORG == "" ]]; then
