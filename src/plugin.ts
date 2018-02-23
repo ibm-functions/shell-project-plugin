@@ -17,9 +17,11 @@ import { switchTo, syncProjectName } from "./lib/cmds/ui";
 import { getCurrentProjectName, getProject, getCurrentProject } from "./lib/storage";
 import { EventEmitter } from 'events';
 
+declare const ui: any;
+
 // preloading hook.
 function init(commandTree, prequire) {
-    if (typeof document === 'undefined') return;
+    if (ui.headless) return;
 
     const host = document.getElementById('openwhisk-api-host');
     if (host) {
