@@ -4,6 +4,7 @@ set -e
 
 echo "install the shell"
 export DEBUG=*
+export NODE_OPTIONS=--max-old-space-size=4096
 npm install -g @ibm-functions/shell
 
 if [[ $BLUEMIX_ORG == "" ]]; then
