@@ -2,6 +2,10 @@
 
 set -e
 
+echo "install the shell"
+export DEBUG=*
+npm install -g @ibm-functions/shell
+
 if [[ $BLUEMIX_ORG == "" ]]; then
     echo "missing BLUEMIX_ORG. Aborting"
     exit 1
