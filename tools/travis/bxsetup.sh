@@ -2,11 +2,7 @@
 
 set -e
 
-unset BLUEMIX_ORG
-unset BLUEMIX_API_KEY
-unset BLUEMIX_SPACE
-
-echo $BLUEMIX_ORG
+cat /proc/meminfo
 
 echo "install the shell"
 npm install -g @ibm-functions/shell
