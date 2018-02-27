@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ibm-functions/shell-project-plugin.svg?branch=master)](https://travis-ci.org/ibm-functions/shell-project-plugin)
+
 This [shell](https://github.com/ibm-functions/shell) plugin allows you organize OpenWhisk assets into **projects** and to deploy and undeploy project as an unit.
 
 ## ⚙ Getting started
