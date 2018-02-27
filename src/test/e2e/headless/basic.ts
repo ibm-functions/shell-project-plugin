@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 IBM Corporation
+ * Copyright 2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,23 @@
  */
 import { suite, test, slow, timeout, skip } from 'mocha-typescript';
 import * as assert from 'assert';
-import {  } from '../lib/cmds/project-add';
+import { exec } from 'child-process-promise';
 
-@suite('UnitTestSuite')
-class UnitTestSuite {
+@suite('Basic Test - Headless')
+class BasicHeadless {
 
-    @test('should login to bluemix')
-    async loginBx() {
-        assert(true);
+    static async before() {
+        process.chdir('src/test/e2e/headless/fixtures/basic');
+    }
+
+    @test('should add a project')
+    async addProject() {
+        if (process.env.CI !== 'true')
+            return skip(this);
+
+        const ok = await exec('fsh project add');
+        assert.deepEqual(ok, 'ok');
+        const list = await exec('fsh project list');
     }
 
 }

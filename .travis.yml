@@ -18,4 +18,4 @@ install:
   - tools/travis/install.sh
 
 script:
-  - fsh plugin list
+  - npm test

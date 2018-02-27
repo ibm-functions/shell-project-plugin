@@ -16,8 +16,10 @@
 import { getProjects } from '../storage';
 import { ITable, printTable } from './ui';
 import { docList } from './docs';
+import * as colors from 'colors';
 
 declare const repl: any;
+declare const ui: any;
 
 const usage = docList;
 
@@ -29,13 +31,17 @@ const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
 
     const entries = projects.entries;
     if (Object.keys(entries).length === 0) {
-        const div = document.createElement('div');
-        div.innerHTML = `<span>
-                              no registered projects. Please use
-                              <span class='clickable' onclick='repl.partial("project add <your_project path>")'>project add &lt;your_project_path&gt;</span>
+        if (ui.headless) {
+            return 'no projects. Use ' + 'project add'.bold + ' to add a project';
+        } else {
+            const div = document.createElement('div');
+            div.innerHTML = `<span>
+                              no projects. Please use
+                              <span class='clickable' onclick='repl.partial("project add")'>project add</span>
                               to add one
                          </span>`;
-        return div;
+            return div;
+        }
     }
 
     const table = {
