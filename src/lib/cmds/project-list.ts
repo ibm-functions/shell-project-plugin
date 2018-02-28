@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { getProjects } from '../storage';
-import { ITable, printTable } from './ui';
+// import { ITable, printTable } from './ui';
 import { docList } from './docs';
 import * as colors from 'colors';
 
@@ -44,16 +44,40 @@ const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
         }
     }
 
-    const table = {
-        headers: ['Name', 'Path'],
-        rows: Object.keys(entries).map(key => {
-            const onclick = () => repl.pexec(`project set ${key}`);
-            return [{ name: key, onclick }, { name: entries[key].path, onclick }];
-        })
-    };
+    // const table = {
+    //     headers: ['Name', 'Path'],
+    //     rows: Object.keys(entries).map(key => {
+    //         const onclick = () => repl.pexec(`project set ${key}`);
+    //         return [{ name: key, onclick }, { name: entries[key].path, onclick }];
+    //     })
+    // };
 
-    return printTable(table);
+    return Object.keys(entries).map(key => {
+        const value = entries[key];
+        return {
+            name: key,
+            type: 'project',
+            onclick: false,
+            attributes: [
+                {
+                    value: value.path,
+                    css: 'deemphasize'
+                }]
+        };
+    });
 };
+
+// function formatTable(envs: IEnvironments) {
+//     return Object.keys(envs).map(k => {
+//         const v = envs[k];
+//         return { name: v.name, type: 'env', attributes: [
+//             {
+//                 value: document.createTextNode(v.rolling ? rolling.kind] : 'in-place'),
+//                 css: 'green-text'
+//             }]
+//         };
+//     });
+// }
 
 module.exports = (commandTree, require) => {
     const master = commandTree.listen('/project/list', doList, { docs: docList });

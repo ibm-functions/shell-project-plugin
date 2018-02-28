@@ -12,7 +12,4 @@ cp -f $TRAVIS_BUILD_DIR/tools/travis/fsh $TRAVIS_BUILD_DIR/IBM\ Cloud\ Functions
 echo "running fsh --version"
 fsh --version
 
-echo "install project plugin"
-fsh plugin install shell-project-plugin
-
 echo "done"

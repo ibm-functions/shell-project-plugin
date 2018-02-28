@@ -29,67 +29,67 @@ export function syncProjectName() {
     nameElem.childNodes[0].textContent = projectName;
 }
 
-export interface ITable {
-    headers: Array<string>;
-    rows: Array<Array<ICell>>;
-}
+// export interface ITable {
+//     headers: Array<string>;
+//     rows: Array<Array<ICell>>;
+// }
 
-export interface ICell {
-    name: string;
-    onclick?: () => any;
-}
+// export interface ICell {
+//     name: string;
+//     onclick?: () => any;
+// }
 
-export function printTable(table: ITable): HTMLElement {
-    const response = document.createElement('div');
-    response.className = 'result-table';
+// export function printTable(table: ITable): HTMLElement {
+//     const response = document.createElement('div');
+//     response.className = 'result-table';
 
-    const repl = document.createElement('div');
-    response.appendChild(repl);
-    repl.className = 'repl-result';
+//     const repl = document.createElement('div');
+//     response.appendChild(repl);
+//     repl.className = 'repl-result';
 
-    const rows = document.createElement('div');
-    repl.appendChild(rows);
-    rows.className = 'entity';
+//     const rows = document.createElement('div');
+//     repl.appendChild(rows);
+//     rows.className = 'entity';
 
-    if (table.headers) {
-        const headers = document.createElement('div');
-        rows.appendChild(headers);
-        headers.className = 'entity-attributes';
-        headers.style.fontWeight = '500';
-        headers.style.borderBottom = '1px solid';
-        table.headers.forEach(headerText => {
-            headers.appendChild(headerHTML(headerText));
-        });
-    }
+//     if (table.headers) {
+//         const headers = document.createElement('div');
+//         rows.appendChild(headers);
+//         headers.className = 'entity-attributes';
+//         headers.style.fontWeight = '500';
+//         headers.style.borderBottom = '1px solid';
+//         table.headers.forEach(headerText => {
+//             headers.appendChild(headerHTML(headerText));
+//         });
+//     }
 
-    if (table.rows) {
-        table.rows.forEach(rowTexts => {
-            const row = document.createElement('div');
-            rows.appendChild(row);
-            row.className = 'entity-attributes';
+//     if (table.rows) {
+//         table.rows.forEach(rowTexts => {
+//             const row = document.createElement('div');
+//             rows.appendChild(row);
+//             row.className = 'entity-attributes';
 
-            rowTexts.forEach(cell => {
-                row.appendChild(cellHTML(cell));
-            });
-        });
-    }
+//             rowTexts.forEach(cell => {
+//                 row.appendChild(cellHTML(cell));
+//             });
+//         });
+//     }
 
-    return response;
-}
+//     return response;
+// }
 
-function headerHTML(text: string): HTMLElement {
-    const header = document.createElement('span');
-    header.style.textAlign = 'center';
-    header.innerText = text;
-    return header;
-}
+// function headerHTML(text: string): HTMLElement {
+//     const header = document.createElement('span');
+//     header.style.textAlign = 'center';
+//     header.innerText = text;
+//     return header;
+// }
 
-function cellHTML(cell: ICell): HTMLElement {
-    const span = document.createElement('span');
-    span.className = 'entity-name-group';
-    span.innerText = cell.name;
-    if (cell.onclick) {
-        span.onclick = cell.onclick;
-    }
-    return span;
-}
+// function cellHTML(cell: ICell): HTMLElement {
+//     const span = document.createElement('span');
+//     span.className = 'entity-name-group';
+//     span.innerText = cell.name;
+//     if (cell.onclick) {
+//         span.onclick = cell.onclick;
+//     }
+//     return span;
+// }

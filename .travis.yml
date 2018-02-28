@@ -13,9 +13,14 @@ before_install:
   - sleep 3
   - export PATH=$TRAVIS_BUILD_DIR/IBM\ Cloud\ Functions\ Shell-linux-x64/:$PATH
   - tools/travis/bxsetup.sh
+  - tools/travis/fshinstall.sh
 
 install:
-  - tools/travis/install.sh
+  - npm install
 
-script:
-  - npm test
+jobs:
+  include:
+    - stage: e2einstall
+      script: ./src/test/e2e/plugininstall.sh
+    - stage: tests
+      script: npm test
