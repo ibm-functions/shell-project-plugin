@@ -19,10 +19,10 @@ import { docRemove } from './docs';
 
 const usage = `${docRemove}.
 
-\tremove <projectName>
+\tremove <project_name>
 
 Required parameters:
-\t<project_path>       the project name to remove`;
+\t<project_name>       the project name to remove`;
 
 const doRemove = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)

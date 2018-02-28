@@ -21,7 +21,7 @@ declare const ui: any;
 
 // preloading hook.
 function init(commandTree, prequire) {
-    if (ui.headless) return;
+    if (typeof ui.headless === 'undefined' || ui.headless) return;
 
     const host = document.getElementById('openwhisk-api-host');
     if (host) {

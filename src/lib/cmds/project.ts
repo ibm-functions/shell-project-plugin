@@ -15,21 +15,25 @@
  */
 import * as docs from './docs';
 
-const usage = `Command related to projects.
-\tproject add                          [ ${docs.docAdd} ]
-\tproject set                          [ ${docs.docSet} ]
-\tproject unset                        [ ${docs.docUnset} ]
-\tproject remove                       [ ${docs.docRemove} ]
-\tproject list                         [ ${docs.docList} ]
-\tproject deploy                       [ ${docs.docDeploy} ]
-\tproject undeploy                     [ ${docs.docUndeploy} ]`;
-
-const doProject = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
-    throw new modules.errors.usage(usage);
+const usage = {
+    title: 'Project management operations',
+    header: 'These commands will help you create, switch and deploy projects',
+    example: 'project <command>',
+    commandPrefix: 'project',
+    available: [
+        { command: 'add', docs: docs.docAdd, partial: '--path .' },
+        { command: 'remove', docs: docs.docRemove, partial: '<project_name>' },
+        { command: 'set', docs: docs.docSet, partial: '<project_name>' },
+        { command: 'unset', docs: docs.docUnset },
+        { command: 'list', docs: docs.docList },
+        { command: 'deploy', docs: docs.docDeploy, partial: '-m manifest.yml' },
+        { command: 'undeploy', docs: docs.docUndeploy }
+    ],
+    related: []
 };
 
 module.exports = (commandTree, prequire) => {
-    commandTree.listen('/project', doProject, { docs: 'Command related to projects' });
+    commandTree.subtree('/project', { usage });
 
     require('./project-add')(commandTree, prequire);
     require('./project-set')(commandTree, prequire);
