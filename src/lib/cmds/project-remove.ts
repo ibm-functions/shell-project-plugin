@@ -15,14 +15,14 @@
  */
 import { sliceCmd, error } from './cli';
 import { removeProject } from '../storage';
-import { docRemove } from './docs';
+// import { docRemove } from './docs';
 
-const usage = `${docRemove}.
+// const usage = `${docRemove}.
 
-\tremove <project_name>
+// \tremove <project_name>
 
-Required parameters:
-\t<project_name>       the project name to remove`;
+// Required parameters:
+// \t<project_name>       the project name to remove`;
 
 const doRemove = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
@@ -39,5 +39,5 @@ const doRemove = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
 };
 
 module.exports = (commandTree, require) => {
-    commandTree.listen('/project/remove', doRemove, { docs: docRemove });
+    commandTree.listen('/project/remove', doRemove, { docs: '' });
 };

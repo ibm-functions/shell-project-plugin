@@ -20,8 +20,9 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { execSync } from 'child_process';
 import * as dbgc from 'debug';
-const debug = dbgc('project:deploy');
+import { deploy } from '../deploy';
 
+const debug = dbgc('project:cmd:deploy');
 const usage = `Deploy project.
 
 \tdeploy
@@ -45,40 +46,10 @@ const doDeploy = prequire => async (block, nextBlock, _3, { ui, errors }, _4, _5
     if (!existsSync(file))
         return error({ errors }, `${file} does not exists`);
 
-    checkExtraneousFlags({ errors }, argv);
+    checkExtraneousFlags(errors, argv);
 
-    const env = getEnvPlugin(prequire);
-    const current = env ? env.current() : null;
-    const userData = ui.userDataDir();
-
-    const sysenv = prepareEnvVars(current);
-    const wskdeploy = join(getToolsDir(ui), 'wskdeploy').replace(/[ ]/g, '\\ ');
-
-    return execSync(`${wskdeploy} --managed`, { env: sysenv }).toString();
+    return deploy(prequire, ui, file);
 };
-
-function getEnvPlugin(prequire) {
-    try {
-        return prequire('shell-environment-plugin');
-    } catch (e) {
-        // no environment, fine
-        return null;
-    }
-}
-
-// Extends system environment variables
-function prepareEnvVars(env): { [key: string]: string } {
-    if (env) {
-        const vars = { ...env.variables };
-        Object.keys(vars).forEach(key => {
-            vars[key] = vars[key].value;
-        });
-        // TODO: consider not inheriting process env
-        return { ...process.env, ...vars };
-    }
-    // TODO: consider not inheriting process env
-    return { ...process.env };
-}
 
 module.exports = (commandTree, prequire) => {
     commandTree.listen('/project/deploy', doDeploy(prequire), { docs: 'Deploy project' });

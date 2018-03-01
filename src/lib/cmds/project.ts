@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as docs from './docs';
-
 const usage = {
     title: 'Project management operations',
     header: 'These commands will help you create, switch and deploy projects',
     example: 'project <command>',
     commandPrefix: 'project',
     available: [
-        { command: 'add', docs: docs.docAdd, partial: '--path .' },
-        { command: 'remove', docs: docs.docRemove, partial: '<project_name>' },
-        { command: 'set', docs: docs.docSet, partial: '<project_name>' },
-        { command: 'unset', docs: docs.docUnset },
-        { command: 'list', docs: docs.docList },
-        { command: 'deploy', docs: docs.docDeploy, partial: '-m manifest.yml' },
-        { command: 'undeploy', docs: docs.docUndeploy }
+        { command: 'add', docs: 'Add project to the shell' },
+        { command: 'remove', docs: 'Remove project from the shell', partial: '<project_name>' },
+        { command: 'set', docs: 'Set current project', partial: '<project_name>' },
+        { command: 'unset', docs: 'Unset current project' },
+        { command: 'list', docs: 'List projects added to the shell' },
+        { command: 'import', docs: 'Import external project to the current project' },
+        { command: 'deploy', docs: 'Deploy project' },
+        { command: 'undeploy', docs: 'Undeploy project' }
     ],
     related: []
 };
@@ -40,6 +39,8 @@ module.exports = (commandTree, prequire) => {
     require('./project-unset')(commandTree, prequire);
     require('./project-remove')(commandTree, prequire);
     require('./project-list')(commandTree, prequire);
+    require('./project-import')(commandTree, prequire);
+
     require('./project-deploy')(commandTree, prequire);
     require('./project-undeploy')(commandTree, prequire);
 };

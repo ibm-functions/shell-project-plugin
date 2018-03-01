@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 import { unsetCurrentProject } from '../storage';
-import { docUnset } from './docs';
 import { syncProjectName } from './ui';
 
-const usage = docUnset;
+const usage = {
+    header: 'Unset current project and return to namespace mode',
+    example: 'project unset'
+};
 
 const doUnset = (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
@@ -30,5 +32,5 @@ const doUnset = (_1, _2, _3, modules, _4, _5, _6, argv) => {
 };
 
 module.exports = (commandTree, prequire) => {
-    commandTree.listen('/project/unset', doUnset, { docs: docUnset });
+    commandTree.listen('/project/unset', doUnset);
 };

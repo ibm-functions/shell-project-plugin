@@ -15,12 +15,15 @@
  */
 import { getProject } from '../storage';
 import { error, sliceCmd } from './cli';
-import { docSet } from './docs';
 import { switchTo } from './ui';
 
-const usage = `${docSet}
-
-\tset <project_name>`;
+const usage = {
+    header: 'Set current project',
+    example: 'project set [<project_name>]',
+    required: [
+        { name: '<project_name>', docs: 'the project name to set' }
+    ]
+};
 
 const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
@@ -42,5 +45,5 @@ const doSet = wsk => (_1, _2, _3, modules, _4, _5, _6, argv) => {
 module.exports = (commandTree, prequire) => {
     const wsk = prequire('/ui/commands/openwhisk-core');
 
-    commandTree.listen('/project/set', doSet(wsk), { docs: docSet });
+    commandTree.listen('/project/set', doSet(wsk));
 };

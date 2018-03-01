@@ -18,8 +18,8 @@ import { getCurrentProjectName } from '../storage';
 import * as dbgc from 'debug';
 const debug = dbgc('project:cli');
 
-export function error(modules, msg: string, usage = '') {
-    throw new modules.errors.usage(`${msg}${usage ? '\n\n' : ''}${usage}`);
+export function error(errors, msg: string, usage = '') {
+    throw new errors.usage(`${msg}${usage ? '\n\n' : ''}${usage}`);
 }
 
 export function consume(argv, options: string[]) {
@@ -30,15 +30,15 @@ export function consume(argv, options: string[]) {
     }, undefined);
 }
 
-export function checkExtraneous(modules, argv) {
+export function checkExtraneous(errors, argv) {
     if (argv._.length !== 0)
-        throw new modules.errors.usage(`Extraneous argument(s): ${argv._.join(', ')}`);
+        throw new errors.usage(`Extraneous argument(s): ${argv._.join(', ')}`);
 }
 
-export function checkExtraneousFlags(modules, argv) {
+export function checkExtraneousFlags(errors, argv) {
     delete argv._;
     if (Object.keys(argv).length !== 0)
-        throw new modules.errors.usage(`Extraneous flags(s): ${Object.keys(argv).join(', ')}`);
+        throw new errors.usage(`Extraneous flags(s): ${Object.keys(argv).join(', ')}`);
 }
 
 export function sliceCmd(argv, cmd) {
