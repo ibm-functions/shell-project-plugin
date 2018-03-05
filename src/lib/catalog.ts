@@ -16,6 +16,7 @@
 
 import * as octokitc from '@octokit/rest';
 import { get } from 'https';
+import { join } from 'path';
 import * as dbgc from 'debug';
 
 const debug = dbgc('project:catalog');
@@ -46,6 +47,7 @@ export interface IManifestDesc {
     description: string;
     long_description: string;
     url: string;
+    id: string;
     full_name: string;
     runtime: Array<IManifestDescRuntime>;
     categories: Array<string>;
@@ -56,24 +58,9 @@ export interface IManifestDescRuntime {
     kind: string;
     type: string;
 }
-
-export async function searchTemplates(): Promise<ManifestBP> {
-    const octokit = new octokitc();
-    const repos = await octokit.search.repos({ q: 'topic:openwhisk-packages+fork:true' }) as IRepos;
-    debug(repos);
-    // TODO: looks at tags.
-    const validrepos = [];
-    for (let item of repos.data.items) {
-        const content = await httpGet(`https://raw.githubusercontent.com/${item.full_name}/master/manifest-bp.json`) as IManifestDesc;
-
-        if (content) {
-            content.url = item.html_url;
-            content.full_name = item.full_name;
-            validrepos.push(item);
-        }
-    }
-
-    return validrepos;
+export async function getTemplate(name: string): Promise<IManifestDesc> {
+    const templates = await getCatalog();
+    return templates.find(template => template.name === name);
 }
 
 async function httpGet(url: string) {
@@ -102,11 +89,13 @@ async function httpGet(url: string) {
     });
 }
 
+// https://raw.githubusercontent.com/${item.full_name}/master/runtimes/nodejs/manifest.yaml
+
 export function formatAsTable(repos: ManifestBP) {
     return repos.map(item => ({
         name: item.name,
         type: 'template',
-        onclick: () => repl.pexec(`project import https://raw.githubusercontent.com/${item.full_name}/master/runtimes/nodejs/manifest.yaml`),
+        onclick: () => repl.pexec(`project import "${item.name}"`),
         attributes: [
             {
                 value: item.description,
@@ -118,4 +107,81 @@ export function formatAsTable(repos: ManifestBP) {
             }]
 
     }));
+}
+
+export function showTemplateInSidecar(template: IManifestDesc) {
+    ui.injectCSS(join(__dirname, '..', '..', 'resources', 'sidecar.css'));
+
+    ui.addNameToSidecarHeader(undefined, template.name, template.full_name, 'onclick', 'template');
+    ui.addVersionBadge({version: 'boo'}, true);
+    const deployMode = {
+        mode: 'deploy',
+        label: 'Deploy',
+        type: 'custom',
+        actAsButton: true,
+        direct: () => {
+            const packageName = (document.getElementById('sidecar-template-input-PACKAGE') as HTMLInputElement).value;
+
+            repl.pexec(`project import https://raw.githubusercontent.com/${template.full_name}/master/runtimes/nodejs/manifest.yaml -p PACKAGE=${packageName}`);
+        }
+    };
+
+    ui.showCustom({ content: sidecar(template), modes: [deployMode] });
+}
+
+// --- HTML
+
+function sidecar(template: IManifestDesc): HTMLDivElement {
+    const div = document.createElement('div');
+    div.className = 'sidecar-template';
+    div.innerHTML = `
+        <div class="sidecar-template-desc">
+            <span>${template.long_description}</span>
+        </div>
+        <div class="sidecar-template-inputs">
+            <span class="sidecar-template-input-header">Input Parameters</span>
+            ${parameter('PACKAGE', 'Package name')}
+        <div>`;
+
+    return div;
+}
+
+function parameter(name: string, label: string): string {
+    return `<div class="sidecar-template-input">
+              <label class="sidecar-template-input-label">${label}</label>
+              <input onclick="event.stopPropagation();" class="sidecar-template-input-text" type="text" id="sidecar-template-input-${name}"/>
+            </div>`;
+}
+
+// --- Local template catalog cache
+
+const catalogkey = 'wsk.project.catalog';
+
+async function refreshCatalogCache(): Promise<ManifestBP> {
+    const octokit = new octokitc();
+    const repos = await octokit.search.repos({ q: 'topic:openwhisk-packages+fork:true' }) as IRepos;
+    debug(repos);
+
+    // TODO: looks at tagged repos.
+    const validrepos = [];
+    for (let item of repos.data.items) {
+        const content = await httpGet(`https://raw.githubusercontent.com/${item.full_name}/master/manifest-bp.json`) as IManifestDesc;
+        if (content) {
+            content.url = item.html_url;
+            content.full_name = item.full_name;
+            content.id = item.name;
+            validrepos.push(content);
+        }
+    }
+
+    localStorage.setItem(catalogkey, JSON.stringify(validrepos));
+    return validrepos;
+}
+
+export async function getCatalog(): Promise<ManifestBP> {
+    const catalog = localStorage.getItem(catalogkey);
+    if (!catalog)
+        return refreshCatalogCache();
+
+    return JSON.parse(catalog);
 }

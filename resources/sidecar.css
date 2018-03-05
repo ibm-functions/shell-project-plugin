@@ -1,0 +1,33 @@
+.sidecar-template {
+    margin: 30px;
+}
+
+.sidecar-template-desc {
+    font-weight: 200
+}
+
+.sidecar-template-inputs {
+    margin-top: 50px;
+}
+
+.sidecar-template-input-header {
+    font-weight: 500;
+    border-bottom: 1px solid black;
+    display: block;
+    width: 100%;
+    margin-bottom: 20px
+}
+
+.sidecar-template-input {
+    margin: 10px;
+}
+
+.sidecar-template-input-label {
+    font-weight: 700;
+    font-size: 80%;
+}
+
+.sidecar-template-input-text {
+    display: inline-block;
+    width: 100%;
+}

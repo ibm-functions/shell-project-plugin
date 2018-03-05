@@ -23,12 +23,16 @@ import * as dbgc from 'debug';
 import { deploy } from '../deploy';
 
 const debug = dbgc('project:cmd:deploy');
-const usage = `Deploy project.
 
-\tdeploy
-
-Optional parameters:
-\t-m <manifest.yml>       the manifest to deploy (default manifest.yml)`;
+const usage = {
+    title: 'Deploy project',
+    header: '',
+    example: 'deploy',
+    optional: [
+        { name: '<url>', docs: 'the URL pointing to the manifest to deploy' },
+        { name: '-m|--manifest', docs: 'path to the manifest file' },
+    ]
+};
 
 const doDeploy = prequire => async (block, nextBlock, _3, { ui, errors }, _4, _5, _6, argv) => {
     if (argv.help) {
@@ -48,9 +52,9 @@ const doDeploy = prequire => async (block, nextBlock, _3, { ui, errors }, _4, _5
 
     checkExtraneousFlags(errors, argv);
 
-    return deploy(prequire, ui, file);
+    return deploy(prequire, ui, file, true);
 };
 
 module.exports = (commandTree, prequire) => {
-    commandTree.listen('/project/deploy', doDeploy(prequire), { docs: 'Deploy project' });
+    commandTree.listen('/project/deploy', doDeploy(prequire));
 };

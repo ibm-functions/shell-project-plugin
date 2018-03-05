@@ -16,19 +16,20 @@
 import { existsSync } from 'fs';
 import { checkTools, getToolsDir } from './tools';
 import { join } from 'path';
-import { execSync } from 'child_process';
+import { execSync, ExecSyncOptions } from 'child_process';
 import * as dbgc from 'debug';
 const debug = dbgc('project:deploy');
 
-export async function deploy(prequire, ui, location) {
+export async function deploy(prequire, ui, location, managed: boolean, inputs: { [key: string]: string } = {}) {
     const env = getEnvPlugin(prequire);
     const current = env ? env.current() : null;
     const userData = ui.userDataDir();
 
-    const sysenv = prepareEnvVars(current);
+    let sysenv = prepareEnvVars(current);
     const wskdeploy = join(getToolsDir(ui), 'wskdeploy').replace(/[ ]/g, '\\ ');
 
-    return execSync(`${wskdeploy} --managed -m ${location}`, { env: sysenv }).toString();
+    sysenv = {...sysenv, ...inputs };
+    return execSync(`${wskdeploy} ${managed ? '--managed' : ''} -m ${location}`, { env: sysenv }).toString();
 }
 
 function getEnvPlugin(prequire) {

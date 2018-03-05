@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 import { sliceCmd, error, consume, checkExtraneous, checkExtraneousFlags } from './cli';
-import { searchTemplates, formatAsTable } from '../catalog';
+import { formatAsTable, showTemplateInSidecar, getTemplate, getCatalog } from '../catalog';
 import { checkTools } from '../tools';
 import { deploy } from '../deploy';
 
 const usage = {
-    title: 'Import a project template from github',
+    title: 'Import a project template from Github',
     header: '',
-    example: 'import [<owner/repo>], import [<url>]',
+    example: 'import [<name>], import [<url>]', // import [<owner/repo>],
     optional: [
-        { name: '<owner/repo>', docs: 'the github repository containing the template' },
-        { name: '<url>', docs: 'the github repository containing the template' },
-        { name: '-p|--path', docs: 'path to the manifest file' }
+        { name: '<name>', docs: 'the template name' },
+        // { name: '<owner/repo>', docs: 'the github repository containing the template' },
+        { name: '<url>', docs: 'the URL pointing to the manifest to deploy' },
+        { name: '-p|--param', docs: 'template parameter KEY=VALUE' }
 
     ]
 };
@@ -40,20 +41,43 @@ const doImport = prequire => async (block, nextBlock, _3, { errors, ui }, _4, _5
 
     checkExtraneous(errors, argv);
 
-    const p = `/${consume(argv, ['p', 'path']) || 'manifest.yaml'}`;
-
-    checkExtraneousFlags(errors, argv);
-
     if (!repo) {
-        const repos = await searchTemplates();
+        checkExtraneousFlags(errors, argv);
+
+        const repos = await getCatalog();
         return formatAsTable(repos);
     } else {
-        const err = await checkTools(block, nextBlock, { ui });
-        if (err !== "")
-            return error({ errors }, err);
+        if (repo.startsWith('https:')) {
 
-        const url = repo.startsWith('https:') ? repo : `https://raw.githubusercontent.com/${repo}${p}`;
-        return deploy(prequire, ui, url);
+            const err = await checkTools(block, nextBlock, { ui });
+            if (err !== "")
+                return error({ errors }, err);
+
+            const params = consume(argv, ['p', 'param']);
+            checkExtraneousFlags(errors, argv);
+
+            const aparams: Array<string> = typeof params === 'string' ? [params] : params;
+            const kvs = {};
+            aparams.forEach(kv => {
+                const eqidx = kv.indexOf('=');
+                if (eqidx === -1)
+                    return error({ errors }, `malformed parameters ${kv}. Expected KEY=VALUE`);
+
+                kvs[kv.substring(0, eqidx - 1)] = kv.substr(eqidx + 1);
+            });
+
+            return deploy(prequire, ui, repo, false, kvs);
+        } else {
+            checkExtraneousFlags(errors, argv);
+
+            const template = await getTemplate(repo);
+            if (template) {
+                showTemplateInSidecar(template);
+                return true;
+            } else {
+                return `no template found`;
+            }
+        }
     }
 };
 
