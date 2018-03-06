@@ -19,8 +19,7 @@ import { EventEmitter } from 'events';
 
 declare const ui: any;
 
-// preloading hook.
-function init(commandTree, prequire) {
+function activate(commandTree, prequire) {
     if (typeof ui.headless === 'undefined' || ui.headless) return;
 
     const host = document.getElementById('openwhisk-api-host');
@@ -43,7 +42,7 @@ module.exports = (commandTree, prequire) => {
     require('./lib/cmds/project')(commandTree, prequire);
     require('./lib/cmds/wsk')(commandTree, prequire);
 
-    init(commandTree, prequire);
+    activate(commandTree, prequire);
 
     return {
         current: getCurrentProject
