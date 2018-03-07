@@ -7,20 +7,21 @@ sudo: required
 env:
   global:
     - DISPLAY=:99
+    - SHELL_DIR=$TRAVIS_BUILD_DIR/../shell
 
 before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
-  - export PATH=$TRAVIS_BUILD_DIR/IBM\ Cloud\ Functions\ Shell-linux-x64/:$PATH
   - tools/travis/bxsetup.sh
-  - tools/travis/fshinstall.sh
+  - export PATH=$SHELL_DIR/app/bin:$PATH
+  - tools/travis/fshclone.sh
 
 install:
   - npm install
+  - npm run compilenowatch
+  - tools/travis/plugininstall.sh
 
 jobs:
   include:
-    - stage: e2einstall
-      script: ./src/test/e2e/plugininstall.sh
     - stage: tests
       script: npm test

@@ -30,8 +30,9 @@ class BasicHeadless {
             return skip(this);
 
         const ok = await exec('fsh project add');
-        assert.deepEqual(ok, 'ok');
+        assert.deepEqual(ok.stdout, 'ok\n');
         const list = await exec('fsh project list');
+        assert.ok(list.stdout.includes('basic'));
     }
 
 }
