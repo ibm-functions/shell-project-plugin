@@ -3,7 +3,7 @@
 set -e
 
 echo "install project plugin"
-fsh plugin install shell-project-plugin
+DEBUG=* fsh plugin install shell-project-plugin
 
 echo "list plugin"
 fsh plugin list
