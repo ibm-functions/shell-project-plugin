@@ -13,12 +13,12 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
   - tools/travis/bxsetup.sh
-  - tools/travis/fshclone.sh
   - export PATH=$SHELL_DIR/app/bin:$PATH
+  - tools/travis/fshclone.sh
 
 install:
   - npm install
-  - npm script compilenowatch
+  - npm run compilenowatch
   - tools/travis/plugininstall.sh
 
 jobs:
