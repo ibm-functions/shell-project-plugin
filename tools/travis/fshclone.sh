@@ -8,4 +8,6 @@ echo "cloning https://github.com/ibm-functions/shell.git"
 echo "install shell"
 (cd $SHELL_DIR/app && npm install)
 
+fsh version
+
 echo "done"
