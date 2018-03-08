@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 import { getProjects } from '../storage';
-// import { ITable, printTable } from './ui';
-// import { docList } from './docs';
 import * as colors from 'colors';
 
 declare const repl: any;
 declare const ui: any;
-
-// const usage = docList;
 
 const doList = async (_1, _2, _3, modules, _4, _5, _6, argv) => {
     if (argv.help)
