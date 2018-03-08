@@ -33,6 +33,26 @@ const doList = rawList => async function () {
             const managed = getManagedAnnotation(action.annotations);
             return managed ? managed.__OW_PROJECT_NAME === projectName : false;
         });
+    } else {
+        result.forEach(entity => {
+            entity.attributes = [];
+            const kind = entity.annotations.find(({ key }) => key === 'exec');
+            if (kind || entity.prettyKind) {
+                entity.attributes = [{
+                    value: entity.prettyKind || kind.value,
+                    outerCSS: 'entity-kind green-text',
+                    css: 'deemphasize deemphasize-partial'
+                }];
+            }
+
+            const managed = getManagedAnnotation(entity.annotations);
+            entity.attributes = [...entity.attributes,
+            {
+                value: managed ? managed.__OW_PROJECT_NAME || 'global' : 'global',
+                css: 'deemphasize'
+            }];
+
+        });
     }
     return result;
 };
