@@ -89,8 +89,6 @@ async function httpGet(url: string) {
     });
 }
 
-// https://raw.githubusercontent.com/${item.full_name}/master/runtimes/nodejs/manifest.yaml
-
 export function formatAsTable(repos: ManifestBP) {
     return repos.map(item => ({
         name: item.name,
@@ -113,7 +111,7 @@ export function showTemplateInSidecar(template: IManifestDesc) {
     ui.injectCSS(join(__dirname, '..', '..', 'resources', 'sidecar.css'));
 
     ui.addNameToSidecarHeader(undefined, template.name, template.full_name, 'onclick', 'template');
-    ui.addVersionBadge({version: 'boo'}, true);
+    ui.addVersionBadge({ version: 'boo' }, true);
     const deployMode = {
         mode: 'deploy',
         label: 'Deploy',
@@ -122,7 +120,7 @@ export function showTemplateInSidecar(template: IManifestDesc) {
         direct: () => {
             const packageName = (document.getElementById('sidecar-template-input-PACKAGE') as HTMLInputElement).value;
 
-            repl.pexec(`project import https://raw.githubusercontent.com/${template.full_name}/master/runtimes/nodejs/manifest.yaml -p PACKAGE=${packageName}`);
+            repl.pexec(`project import "${template.url}.git/runtimes/nodejs/manifest.yaml" -p PACKAGE_NAME=${packageName}`);
         }
     };
 
