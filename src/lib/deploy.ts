@@ -18,9 +18,14 @@ import { checkTools, getToolsDir } from './tools';
 import { join } from 'path';
 import { execSync, ExecSyncOptions } from 'child_process';
 import * as dbgc from 'debug';
+import { gitClone } from './git';
 const debug = dbgc('project:deploy');
 
-export async function deploy(prequire, ui, location, managed: boolean, inputs: { [key: string]: string } = {}) {
+export async function deploy(prequire, ui, location: string, managed: boolean, inputs: { [key: string]: string } = {}) {
+    if (location.startsWith('http')) {
+        location = await gitClone(location);
+    }
+
     const env = getEnvPlugin(prequire);
     const current = env ? env.current() : null;
     const userData = ui.userDataDir();
@@ -29,7 +34,9 @@ export async function deploy(prequire, ui, location, managed: boolean, inputs: {
     const wskdeploy = join(getToolsDir(ui), 'wskdeploy').replace(/[ ]/g, '\\ ');
 
     sysenv = {...sysenv, ...inputs };
-    return execSync(`${wskdeploy} ${managed ? '--managed' : ''} -m ${location}`, { env: sysenv }).toString();
+    debug(sysenv);
+
+    return execSync(`${wskdeploy} ${managed ? '--managed' : ''} -m "${location}"`, { env: sysenv }).toString();
 }
 
 function getEnvPlugin(prequire) {

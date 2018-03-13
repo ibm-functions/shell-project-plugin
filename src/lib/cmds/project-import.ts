@@ -63,7 +63,7 @@ const doImport = prequire => async (block, nextBlock, _3, { errors, ui }, _4, _5
                 if (eqidx === -1)
                     return error({ errors }, `malformed parameters ${kv}. Expected KEY=VALUE`);
 
-                kvs[kv.substring(0, eqidx - 1)] = kv.substr(eqidx + 1);
+                kvs[kv.substring(0, eqidx)] = kv.substr(eqidx + 1);
             });
 
             return deploy(prequire, ui, repo, false, kvs);

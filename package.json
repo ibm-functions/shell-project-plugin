@@ -31,7 +31,8 @@
     "follow-redirects": "^1.4.1",
     "fs-extra": "^5.0.0",
     "npm": "^5.7.1",
-    "properties-parser": "^0.3.1"
+    "properties-parser": "^0.3.1",
+    "simple-git": "^1.92.0"
   },
   "devDependencies": {
     "@types/debug": "^0.0.30",
