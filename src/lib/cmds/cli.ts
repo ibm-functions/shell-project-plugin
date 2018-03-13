@@ -37,8 +37,9 @@ export function checkExtraneous(errors, argv) {
 
 export function checkExtraneousFlags(errors, argv) {
     delete argv._;
-    if (Object.keys(argv).length !== 0)
-        throw new errors.usage(`Extraneous flags(s): ${Object.keys(argv).join(', ')}`);
+    const keys = Object.keys(argv).filter(key => argv[key]);
+    if (keys.length !== 0)
+        throw new errors.usage(`Extraneous flags(s): ${keys.join(', ')}`);
 }
 
 export function sliceCmd(argv, cmd) {

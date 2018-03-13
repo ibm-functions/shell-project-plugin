@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lionelvillard/shell-project-plugin.git"
+    "url": "https://github.com/ibm-functions/shell-project-plugin.git"
   },
   "keywords": [
     "openwhisk",
