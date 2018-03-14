@@ -41,6 +41,7 @@ function activate(commandTree, prequire) {
 module.exports = (commandTree, prequire) => {
     require('./lib/cmds/project')(commandTree, prequire);
     require('./lib/cmds/wsk')(commandTree, prequire);
+    require('./lib/cmds/auth-new')(commandTree, prequire);
 
     activate(commandTree, prequire);
 
